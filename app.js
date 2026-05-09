@@ -1,5 +1,70 @@
 'use strict';
 
+/* ─── Auth ──────────────────────────────────────────────────────────────── */
+// Replace with your Google Cloud OAuth 2.0 Client ID
+const GOOGLE_CLIENT_ID = '871342362207-fjdg7rsr9o0i994una8qnuueidji3u3n.apps.googleusercontent.com';
+const AUTH_KEY = 'taskflow_user';
+
+function parseJwt(token) {
+  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(decodeURIComponent(
+    atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+  ));
+}
+
+function getUser() {
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY)); }
+  catch { return null; }
+}
+
+function showLoginScreen() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+}
+
+function renderUserInfo(user) {
+  const el = document.getElementById('user-info');
+  if (!el || !user) return;
+  const avatarHtml = user.picture
+    ? `<img class="user-avatar" src="${escHtml(user.picture)}" alt="${escHtml(user.name)}" referrerpolicy="no-referrer" />`
+    : '';
+  el.innerHTML = `
+    ${avatarHtml}
+    <span class="user-name">${escHtml(user.name)}</span>
+    <button class="btn-ghost btn-sm" id="logout-btn">Sign out</button>
+  `;
+  document.getElementById('logout-btn').addEventListener('click', handleLogout);
+}
+
+function handleCredentialResponse(response) {
+  const payload = parseJwt(response.credential);
+  const user = { name: payload.name, email: payload.email, picture: payload.picture, sub: payload.sub };
+  localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+  renderUserInfo(user);
+  showApp();
+  render();
+}
+
+function handleLogout() {
+  localStorage.removeItem(AUTH_KEY);
+  if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
+  document.getElementById('user-info').innerHTML = '';
+  showLoginScreen();
+}
+
+function initGoogleSignIn() {
+  if (!window.google || !google.accounts) { setTimeout(initGoogleSignIn, 150); return; }
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleCredentialResponse, auto_select: false });
+  google.accounts.id.renderButton(document.getElementById('google-signin-btn'), {
+    theme: 'outline', size: 'large', width: 280, text: 'signin_with', shape: 'rectangular',
+  });
+}
+
 /* ─── Storage ──────────────────────────────────────────────────────────── */
 const STORAGE_KEY = 'taskflow_tasks';
 
@@ -427,4 +492,14 @@ document.getElementById('menu-toggle').addEventListener('click', () => {
 overlay.addEventListener('click', closeSidebar);
 
 /* ─── Boot ──────────────────────────────────────────────────────────────── */
-render();
+(function initAuth() {
+  const user = getUser();
+  if (user) {
+    showApp();
+    renderUserInfo(user);
+    render();
+  } else {
+    showLoginScreen();
+    initGoogleSignIn();
+  }
+})();

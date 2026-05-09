@@ -1,3 +1,69 @@
+/* ─── Login screen ──────────────────────────────────────────────────────── */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 1rem;
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem 2rem 2rem;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  animation: scaleIn .2s ease both;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.3px;
+  margin-bottom: .5rem;
+}
+
+.login-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -.4px;
+  color: var(--text);
+  margin: 0;
+}
+
+.login-sub {
+  font-size: .9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 .75rem;
+}
+
+#google-signin-btn {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.login-footer-note {
+  font-size: .75rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: .5rem;
+}
+
 /* ─── Reset & tokens ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -205,6 +271,44 @@ body {
 }
 
 .topbar-left { display: flex; align-items: center; gap: .75rem; flex: 1; }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-shrink: 0;
+}
+
+/* ─── User info (topbar) ─────────────────────────────────────────────────── */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--text);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-sm {
+  padding: .35rem .75rem;
+  font-size: .8rem;
+}
 
 .menu-toggle {
   display: none;
